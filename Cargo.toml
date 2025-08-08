@@ -1,0 +1,16 @@
+[package]
+name = "wordperms"
+version = "0.1.0"
+edition = "2024"
+description = "generate word permutations"
+licence = "MIT"
+authors = ["Attila Repka"]
+
+
+[package.metadata.deb]
+revision = ""
+
+[dependencies]
+clap = { version = "4.5.43", features = ["derive"] }
+itertools = "0.14.0"
+rayon = "1.10.0"
