@@ -15,6 +15,7 @@ Type "cat wordlist.txt"
 Enter
 Sleep 500ms
 Type "wordperms -i wordlist.txt"
+Sleep 1s
 Enter
 Sleep 5s
 Hide
