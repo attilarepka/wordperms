@@ -9,7 +9,7 @@ Set Height 1000
 Set Padding 20
 
 Set TypingSpeed 100ms
-Type 'echo -e "apple\nbanana\n123" >> wordlist.txt'
+Type 'echo -e "apple\nbanana\n123" > wordlist.txt'
 Enter
 Type "cat wordlist.txt"
 Enter

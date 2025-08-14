@@ -13,6 +13,7 @@ Generate all unique permutations of words from an input list, with optional capi
   - `upper` (all uppercase)
 - Limits the total number of results.
 - Limit maximum number of words to include in each permutation combination.
+- Limit minimum length of generated word (character count).
 - Outputs to a file or stdout.
 
 ## Installation
@@ -50,13 +51,22 @@ Wordperms provides a command-line interface with the following options:
 Usage: wordperms [OPTIONS] --input <INPUT>
 
 Options:
-  -i, --input <INPUT>          Input file (one word per line)
-  -m, --max-len <MAX_LEN>      Max number of words per combination [default: 4]
-  -c, --cap-style <CAP_STYLE>  Capitalization style [default: all] [possible values: all, none, first, upper]
-  -l, --limit <LIMIT>          Limit number of generated results
-  -o, --output <OUTPUT>        Output file (default: stdout)
-  -h, --help                   Print help
-  -V, --version                Print version
+  -i, --input <INPUT>
+          Input file (one word per line)
+  -m, --max-words <MAX_WORDS>
+          Max number of words per combination [default: 4]
+  -n, --min-word-length <MIN_WORD_LENGTH>
+          Minimum length of generated word (character count) [default: 0]
+  -c, --cap-style <CAP_STYLE>
+          Capitalization style [default: all] [possible values: all, none, first, upper]
+  -l, --output-limit <OUTPUT_LIMIT>
+          Limit number of generated results
+  -o, --output <OUTPUT>
+          Output file (default: stdout)
+  -h, --help
+          Print help
+  -V, --version
+          Print version
 ```
 
 ## Example
@@ -69,18 +79,19 @@ banana
 
 Run:
 ```bash
-wordperms -i words.txt -m 2 -c all 
+wordperms -i words.txt -m 3 -c all
 ```
 
 Produces permutations like:
 ```
-appleBANANA
-APPLEbanana123
-apple123
-APPLEBanana
-applebanana
-123appleBanana
-BANANAApple123
+apple123BANANA
+123AppleBANANA
+123bananaapple
+BANANAAPPLE123
+123BANANAapple
+123BANANA
+apple123banana
+bananaApple123
 ...
 ```
 
