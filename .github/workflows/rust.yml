@@ -45,7 +45,7 @@ jobs:
       uses: actions/upload-artifact@v4
       with:
         name: amd64deb
-        path: ./target/x86_64-unknown-linux-musl/debian/*
+        path: ./target/debian/*
         overwrite: true
   macosbuild:
     needs: [build, quickcheck]
