@@ -9,7 +9,7 @@ use std::path::PathBuf;
 #[derive(Parser, Debug)]
 #[command(
     name = "wordperms",
-    version = "1.0",
+    version = "0.1.0",
     author = "Attila Repka",
     about = "Generate word permutations"
 )]
@@ -20,15 +20,19 @@ struct Args {
 
     /// Max number of words per combination
     #[arg(short = 'm', long, default_value_t = 4)]
-    max_len: usize,
+    max_words: usize,
+
+    /// Minimum length of generated word (character count)
+    #[arg(short = 'n', long, default_value_t = 0)]
+    min_word_length: usize,
 
     /// Capitalization style
     #[arg(short, long, value_enum, default_value_t = Capitalization::All)]
     cap_style: Capitalization,
 
     /// Limit number of generated results
-    #[arg(short, long)]
-    limit: Option<usize>,
+    #[arg(short = 'l', long)]
+    output_limit: Option<usize>,
 
     /// Output file (default: stdout)
     #[arg(short, long)]
@@ -65,8 +69,13 @@ fn capitalize_first_letter(s: &str) -> String {
     }
 }
 
-fn generate_permutations(words: &[String], len: usize, cap_style: Capitalization) -> Vec<String> {
-    let results: HashSet<String> = (1..=len.min(words.len()))
+fn generate_permutations(
+    words: &[String],
+    max_words: usize,
+    min_word_length: usize,
+    cap_style: Capitalization,
+) -> Vec<String> {
+    (1..=max_words.min(words.len()))
         .flat_map(|len| {
             words
                 .iter()
@@ -81,7 +90,10 @@ fn generate_permutations(words: &[String], len: usize, cap_style: Capitalization
 
                     for capitalized in variants_per_word.iter().multi_cartesian_product() {
                         for perm in capitalized.iter().permutations(len) {
-                            local.insert(perm.iter().map(|s| s.as_str()).collect::<String>());
+                            let candidate = perm.iter().map(|s| s.as_str()).collect::<String>();
+                            if candidate.len() >= min_word_length {
+                                local.insert(candidate);
+                            }
                         }
                     }
 
@@ -92,9 +104,9 @@ fn generate_permutations(words: &[String], len: usize, cap_style: Capitalization
                     a
                 })
         })
-        .collect();
-
-    results.into_iter().collect()
+        .collect::<HashSet<String>>()
+        .into_iter()
+        .collect()
 }
 
 fn main() -> io::Result<()> {
@@ -108,8 +120,13 @@ fn main() -> io::Result<()> {
         .filter(|l| !l.trim().is_empty())
         .collect();
 
-    let mut results = generate_permutations(&input_words, args.max_len, args.cap_style);
-    if let Some(limit) = args.limit {
+    let mut results = generate_permutations(
+        &input_words,
+        args.max_words,
+        args.min_word_length,
+        args.cap_style,
+    );
+    if let Some(limit) = args.output_limit {
         results.truncate(limit);
     }
 
@@ -162,13 +179,18 @@ mod tests {
 
     #[test]
     fn test_generate_permutations() {
-        let mut actual =
-            generate_permutations(&["a".to_string(), "b".to_string()], 2, Capitalization::None);
+        let mut actual = generate_permutations(
+            &["a".to_string(), "b".to_string()],
+            2,
+            0,
+            Capitalization::None,
+        );
         actual.sort_unstable();
         assert_eq!(actual, vec!["a", "ab", "b", "ba"]);
         let mut actual = generate_permutations(
             &["a".to_string(), "b".to_string()],
             2,
+            0,
             Capitalization::First,
         );
         actual.sort_unstable();
@@ -177,12 +199,17 @@ mod tests {
         let mut actual = generate_permutations(
             &["a".to_string(), "b".to_string()],
             2,
+            0,
             Capitalization::Upper,
         );
         actual.sort_unstable();
         assert_eq!(actual, vec!["A", "AB", "B", "BA"]);
-        let mut actual =
-            generate_permutations(&["a".to_string(), "b".to_string()], 2, Capitalization::All);
+        let mut actual = generate_permutations(
+            &["a".to_string(), "b".to_string()],
+            2,
+            0,
+            Capitalization::All,
+        );
         actual.sort_unstable();
         assert_eq!(
             actual,
@@ -194,13 +221,41 @@ mod tests {
 
     #[test]
     fn test_max_len() {
-        let mut actual =
-            generate_permutations(&["a".to_string(), "b".to_string()], 1, Capitalization::None);
+        let mut actual = generate_permutations(
+            &["a".to_string(), "b".to_string()],
+            1,
+            0,
+            Capitalization::None,
+        );
         actual.sort_unstable();
         assert_eq!(actual, vec!["a", "b"]);
-        let mut actual =
-            generate_permutations(&["a".to_string(), "b".to_string()], 2, Capitalization::None);
+        let mut actual = generate_permutations(
+            &["a".to_string(), "b".to_string()],
+            2,
+            0,
+            Capitalization::None,
+        );
         actual.sort_unstable();
         assert_eq!(actual, vec!["a", "ab", "b", "ba"]);
+    }
+
+    #[test]
+    fn test_min_len() {
+        let mut actual = generate_permutations(
+            &["a".to_string(), "b".to_string()],
+            2,
+            1,
+            Capitalization::None,
+        );
+        actual.sort_unstable();
+        assert_eq!(actual, vec!["a", "ab", "b", "ba"]);
+        let mut actual = generate_permutations(
+            &["a".to_string(), "b".to_string()],
+            2,
+            2,
+            Capitalization::None,
+        );
+        actual.sort_unstable();
+        assert_eq!(actual, vec!["ab", "ba"]);
     }
 }
