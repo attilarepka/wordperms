@@ -28,8 +28,8 @@ then wordperms can be installed using a binary `.deb` file provided in each
 [wordperms release](https://github.com/attilarepka/wordperms/releases).
 
 ```
-$ curl -LO https://github.com/attilarepka/wordperms/releases/download/0.1.0/wordperms_0.1.0_amd64.deb
-$ sudo dpkg -i wordperms_0.1.0_amd64.deb
+$ curl -LO https://github.com/attilarepka/wordperms/releases/download/0.2.0/wordperms_0.2.0_amd64.deb
+$ sudo dpkg -i wordperms_0.2.0_amd64.deb
 ```
 
 ## Building
